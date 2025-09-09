@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📦 План поставок v2.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mui/material@5.14.10/umd/material-ui.production.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@mui/material@5.14.10/umd/material-ui.production.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            line-height: 1.6;
+        }
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+        .header-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 2rem;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav-tab {
+            padding: 1rem 0;
+            color: #6b7280;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-tab.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+        .nav-tab:hover {
+            color: #4f46e5;
+        }
+        .main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        .form-input, .form-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            color: #111827;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgb(79 70 229 / 0.1);
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #3730a3;
+        }
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .chip-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .chip-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .chip-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .chip-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        .stat-card.critical {
+            border-left-color: #ef4444;
+        }
+        .stat-card.warning {
+            border-left-color: #f59e0b;
+        }
+        .stat-card.success {
+            border-left-color: #10b981;
+        }
+        .stat-card.info {
+            border-left-color: #3b82f6;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .table th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .table td {
+            font-size: 0.875rem;
+        }
+        .table tr:hover {
+            background: #f9fafb;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <span class="material-icons" style="color: #4f46e5; font-size: 2rem;">inventory</span>
+            <div>
+                <h1 class="header-title">📦 План поставок v2.0</h1>
+                <p class="header-subtitle">Умное планирование поставок с автоматическим формированием</p>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-primary">
+                <span class="material-icons">cloud_upload</span>
+                Загрузить данные
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-tabs">
+            <a href="#supply" class="nav-tab active">
+                <span class="material-icons">local_shipping</span>
+                Авто поставки
+            </a>
+            <a href="#packaging" class="nav-tab">
+                <span class="material-icons">inventory_2</span>
+                Подготовка товаров
+            </a>
+            <a href="#" class="nav-tab" style="opacity: 0.5; pointer-events: none;">
+                <span class="material-icons">manage_accounts</span>
+                Управление артикулами
+            </a>
+            <a href="#" class="nav-tab" style="opacity: 0.5; pointer-events: none;">
+                <span class="material-icons">track_changes</span>
+                Отслеживание
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Supply Planning Section -->
+        <div id="supply-section">
+            <!-- Auto Supply Form -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="material-icons" style="color: #4f46e5; font-size: 1.75rem;">auto_mode</span>
+                    <h2 class="card-title">Автоматическое формирование поставок</h2>
+                </div>
+                
+                <p style="color: #6b7280; margin-bottom: 2rem;">
+                    Система автоматически создаст оптимальные поставки с приоритетом по 2 неделям, учитывая лимит 5500 штук на поставку и время приемки складов.
+                </p>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="form-label">📦 Лимит на поставку (штук)</label>
+                        <input type="number" class="form-input" value="5500" id="limitPerSupply">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">📅 Приоритет дней</label>
+                        <select class="form-select" id="priorityDays">
+                            <option value="7">≤ 7 дней (срочно)</option>
+                            <option value="14" selected>≤ 14 дней (стандарт)</option>
+                            <option value="21">≤ 21 день</option>
+                            <option value="30">≤ 30 дней</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">🚛 Поставок в неделю</label>
+                        <input type="number" class="form-input" value="4" min="1" max="7" id="suppliesPerWeek">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">🏪 Приоритетный склад</label>
+                        <select class="form-select" id="priorityWarehouse">
+                            <option value="kotovsk" selected>Котовск (приоритетный)</option>
+                            <option value="samara">Самара (Новосемейкино)</option>
+                            <option value="krasnodar_nevinnomyssk">Краснодар + Невинномысск</option>
+                            <option value="ekaterinburg">Екатеринбург</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary" id="generateSuppliesBtn">
+                        <span class="material-icons">play_arrow</span>
+                        ✅ Сформировать поставки автоматически
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generated Supplies -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📦 Сформированные поставки</h2>
+                    <span class="chip chip-primary" id="suppliesCount">0 поставок</span>
+                </div>
+                
+                <div id="suppliesContainer">
+                    <div class="loading">
+                        <span class="material-icons" style="margin-right: 0.5rem;">inventory</span>
+                        Нет сформированных поставок. Используйте автоматическое формирование выше.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packaging Section (Hidden by default) -->
+        <div id="packaging-section" style="display: none;">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card critical">
+                    <div class="stat-value" style="color: #ef4444;" id="criticalCount">0</div>
+                    <div class="stat-label">Критичных (≤7 дн)</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value" style="color: #f59e0b;" id="highCount">0</div>
+                    <div class="stat-label">Срочных (≤14 дн)</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value" style="color: #10b981;" id="mediumCount">0</div>
+                    <div class="stat-label">Запас в норме</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-value" style="color: #3b82f6;" id="needPackCount">0</div>
+                    <div class="stat-label">Нужно упаковать</div>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="material-icons" style="color: #6366f1;">filter_list</span>
+                    <h2 class="card-title">🔍 Фильтр по приоритету подготовки</h2>
+                </div>
+
+                <div class="form-field" style="max-width: 300px;">
+                    <label class="form-label">Приоритет по дням</label>
+                    <select class="form-select" id="packagingFilter">
+                        <option value="7">≤ 7 дней (срочно)</option>
+                        <option value="14" selected>≤ 14 дней (срочно)</option>
+                        <option value="30">≤ 30 дней</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📋 Товары требующие подготовки</h2>
+                    <div>
+                        <button class="btn btn-outline">
+                            <span class="material-icons">get_app</span>
+                            Экспорт по приоритету
+                        </button>
+                        <button class="btn btn-primary" style="margin-left: 0.5rem;">
+                            <span class="material-icons">get_app</span>
+                            Экспорт выполненных
+                        </button>
+                    </div>
+                </div>
+
+                <div id="productsContainer">
+                    <div class="loading">
+                        <span class="material-icons" style="margin-right: 0.5rem;">package</span>
+                        Загрузка данных о товарах...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE = 'https://5000-igj1hjpt004phe6i344h8-6532622b.e2b.dev/api';
+        
+        // Current state
+        let currentSection = 'supply';
+        let supplies = [];
+        let packagingData = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+            setupEventListeners();
+            loadInitialData();
+        });
+
+        function setupNavigation() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (href === '#supply') {
+                        showSection('supply');
+                    } else if (href === '#packaging') {
+                        showSection('packaging');
+                    }
+                });
+            });
+        }
+
+        function showSection(section) {
+            // Update navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[href="#${section}"]`).classList.add('active');
+
+            // Show/hide sections
+            document.getElementById('supply-section').style.display = section === 'supply' ? 'block' : 'none';
+            document.getElementById('packaging-section').style.display = section === 'packaging' ? 'block' : 'none';
+
+            currentSection = section;
+
+            // Load section data
+            if (section === 'packaging' && packagingData.length === 0) {
+                loadPackagingData();
+            }
+        }
+
+        function setupEventListeners() {
+            // Generate supplies button
+            document.getElementById('generateSuppliesBtn').addEventListener('click', generateSupplies);
+            
+            // Packaging filter change
+            document.getElementById('packagingFilter').addEventListener('change', function() {
+                loadPackagingData();
+            });
+        }
+
+        async function loadInitialData() {
+            try {
+                await loadSupplies();
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        async function loadSupplies() {
+            try {
+                const response = await axios.get(`${API_BASE}/supply/formed-supplies`);
+                supplies = response.data.data || [];
+                
+                // Update supplies count
+                document.getElementById('suppliesCount').textContent = `${supplies.length} поставок`;
+                
+                // Render supplies
+                renderSupplies();
+            } catch (error) {
+                console.error('Error loading supplies:', error);
+                showError('suppliesContainer', 'Ошибка загрузки поставок: ' + error.message);
+            }
+        }
+
+        async function generateSupplies() {
+            const btn = document.getElementById('generateSuppliesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Генерация...';
+
+            try {
+                const params = {
+                    limitPerSupply: parseInt(document.getElementById('limitPerSupply').value),
+                    priorityDays: parseInt(document.getElementById('priorityDays').value),
+                    suppliesPerWeek: parseInt(document.getElementById('suppliesPerWeek').value),
+                    priorityWarehouse: document.getElementById('priorityWarehouse').value
+                };
+
+                const response = await axios.post(`${API_BASE}/supply/generate-auto-supply`, params);
+                supplies = response.data.data.supplies || [];
+                
+                // Update supplies count
+                document.getElementById('suppliesCount').textContent = `${supplies.length} поставок`;
+                
+                // Render supplies
+                renderSupplies();
+                
+                // Show success message
+                showSuccessMessage('Поставки успешно сгенерированы!');
+                
+            } catch (error) {
+                console.error('Error generating supplies:', error);
+                showError('suppliesContainer', 'Ошибка генерации поставок: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-icons">play_arrow</span> ✅ Сформировать поставки автоматически';
+            }
+        }
+
+        function renderSupplies() {
+            const container = document.getElementById('suppliesContainer');
+            
+            if (supplies.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <span class="material-icons" style="margin-right: 0.5rem;">inventory</span>
+                        Нет сформированных поставок. Используйте автоматическое формирование выше.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            supplies.forEach(supply => {
+                const priorityColor = getPriorityColor(supply.priority);
+                const priorityLabel = getPriorityLabel(supply.priority);
+                
+                html += `
+                    <div class="card" style="border-left: 4px solid ${priorityColor};">
+                        <div style="display: grid; grid-template-columns: 1fr 150px 200px 200px; gap: 2rem; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0 0 0.5rem 0; color: #111827;">
+                                    <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem;">local_shipping</span>
+                                    ${supply.name}
+                                </h3>
+                                <p style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem;">
+                                    📅 ${supply.plannedDate} | 🏪 ${supply.warehouse}
+                                </p>
+                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
+                                    ${supply.statusText}
+                                </p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div style="font-size: 2rem; font-weight: 700; color: #111827;">${supply.totalQuantity.toLocaleString()}</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">шт</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">${supply.totalPositions} позиций</div>
+                            </div>
+                            
+                            <div>
+                                <div class="chip chip-${getPriorityChipColor(supply.priority)}" style="margin-bottom: 0.5rem;">
+                                    ${priorityLabel}
+                                </div>
+                                <div class="chip chip-${supply.status === 'formed' ? 'success' : 'warning'}">
+                                    ${supply.status === 'formed' ? 'Сформирована' : 'Планирование'}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <button class="btn btn-outline btn-sm" style="margin-bottom: 0.5rem;">
+                                    <span class="material-icons">visibility</span>
+                                    Подробности
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    <span class="material-icons">get_app</span>
+                                    Экспорт
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function loadPackagingData() {
+            const priority = document.getElementById('packagingFilter').value;
+            
+            try {
+                const response = await axios.get(`${API_BASE}/packaging/preparation-list?priority=${priority}`);
+                packagingData = response.data.data || [];
+                const summary = response.data.summary || {};
+                
+                // Update stats
+                document.getElementById('criticalCount').textContent = summary.critical || 0;
+                document.getElementById('highCount').textContent = summary.high || 0;
+                document.getElementById('mediumCount').textContent = summary.medium || 0;
+                document.getElementById('needPackCount').textContent = (summary.totalNeedToPack || 0).toLocaleString();
+                
+                // Render products
+                renderPackagingProducts();
+                
+            } catch (error) {
+                console.error('Error loading packaging data:', error);
+                showError('productsContainer', 'Ошибка загрузки данных упаковки: ' + error.message);
+            }
+        }
+
+        function renderPackagingProducts() {
+            const container = document.getElementById('productsContainer');
+            
+            if (packagingData.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <span class="material-icons" style="margin-right: 0.5rem;">package</span>
+                        Нет товаров для подготовки в выбранном периоде.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Артикул</th>
+                            <th>Штрих-код</th>
+                            <th>Дни запаса</th>
+                            <th>Продажи/день</th>
+                            <th>Остаток ВБ</th>
+                            <th>Готовые</th>
+                            <th>Неготовые</th>
+                            <th>Упаковать</th>
+                            <th>Закупить</th>
+                            <th>КИЗ</th>
+                            <th>Приоритет</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            packagingData.slice(0, 50).forEach(product => { // Limit to 50 for performance
+                const priorityColor = getPriorityColor(product.priority);
+                const priorityLabel = getPriorityLabel(product.priority);
+                
+                html += `
+                    <tr style="border-left: 4px solid ${priorityColor};">
+                        <td><strong>${product.article || 'N/A'}</strong></td>
+                        <td style="font-family: monospace; font-size: 0.75rem;">${product.barcode || 'N/A'}</td>
+                        <td class="text-center">
+                            <span style="color: ${product.daysSupply < 7 ? '#ef4444' : product.daysSupply < 14 ? '#f59e0b' : '#10b981'}; font-weight: 600;">
+                                ${Math.round(product.daysSupply || 0)} дн
+                            </span>
+                        </td>
+                        <td class="text-center">${(product.avgDailyOrders || 0).toLocaleString()}</td>
+                        <td class="text-center">${(product.wbStock || 0).toLocaleString()}</td>
+                        <td class="text-center" style="color: #059669; font-weight: 500;">${(product.readyBoxes || 0).toLocaleString()}</td>
+                        <td class="text-center" style="color: #d97706; font-weight: 500;">${(product.unreadyStock || 0).toLocaleString()}</td>
+                        <td class="text-center">
+                            <span class="chip chip-${product.needToPack > 0 ? 'warning' : 'success'}">
+                                ${(product.needToPack || 0).toLocaleString()}
+                            </span>
+                        </td>
+                        <td class="text-center">${(product.needToPurchase || 0).toLocaleString()}</td>
+                        <td class="text-center">
+                            <span class="chip chip-${product.needToApplyKiz > 0 ? 'warning' : 'success'}">
+                                ${product.needToApplyKiz > 0 ? 'Нужен КИЗ' : 'Готово'}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="chip chip-${getPriorityChipColor(product.priority)}">${priorityLabel}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            
+            if (packagingData.length > 50) {
+                html += `<p class="text-center mt-2" style="color: #6b7280;">Показано первых 50 из ${packagingData.length} товаров</p>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function getPriorityColor(priority) {
+            switch (priority) {
+                case 'emergency': return '#ef4444';
+                case 'critical': return '#ef4444';
+                case 'high': return '#f59e0b';
+                case 'medium': return '#10b981';
+                default: return '#6b7280';
+            }
+        }
+
+        function getPriorityChipColor(priority) {
+            switch (priority) {
+                case 'emergency': return 'error';
+                case 'critical': return 'error';
+                case 'high': return 'warning';
+                case 'medium': return 'success';
+                default: return 'primary';
+            }
+        }
+
+        function getPriorityLabel(priority) {
+            switch (priority) {
+                case 'emergency': return 'ЭКСТРЕННО';
+                case 'critical': return 'КРИТИЧНО';
+                case 'high': return 'СРОЧНО';
+                case 'medium': return 'СРЕДНЕ';
+                default: return 'ОБЫЧНО';
+            }
+        }
+
+        function showError(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="error">
+                    <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem;">error</span>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.style.cssText = 'background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;';
+            successDiv.innerHTML = `
+                <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem;">check_circle</span>
+                ${message}
+            `;
+            
+            // Insert at the top of main content
+            const main = document.querySelector('.main');
+            main.insertBefore(successDiv, main.firstChild);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
