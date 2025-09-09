@@ -1,9 +1,16 @@
 const { google } = require('googleapis');
+const mockDataService = require('./mockData');
 
 class GoogleSheetsService {
   constructor() {
     this.sheets = null;
-    this.init();
+    this.useMockData = !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY;
+    
+    if (this.useMockData) {
+      console.log('⚠️ Google Sheets API credentials not found, using mock data');
+    } else {
+      this.init();
+    }
   }
 
   init() {
@@ -20,7 +27,8 @@ class GoogleSheetsService {
       console.log('✅ Google Sheets API initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize Google Sheets API:', error.message);
-      throw new Error('Google Sheets API initialization failed');
+      console.log('⚠️ Falling back to mock data');
+      this.useMockData = true;
     }
   }
 
@@ -28,6 +36,10 @@ class GoogleSheetsService {
    * Get data from analytics sheet (1ИП tab)
    */
   async getAnalyticsData() {
+    if (this.useMockData) {
+      return await mockDataService.getAnalyticsData();
+    }
+
     try {
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: process.env.ANALYTICS_SHEET_ID,
@@ -115,6 +127,10 @@ class GoogleSheetsService {
    * Get warehouse distribution data
    */
   async getWarehouseDistribution() {
+    if (this.useMockData) {
+      return await mockDataService.getWarehouseDistribution();
+    }
+
     try {
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: process.env.ANALYTICS_SHEET_ID,
@@ -189,6 +205,10 @@ class GoogleSheetsService {
    * Get packed goods data
    */
   async getPackedGoodsData() {
+    if (this.useMockData) {
+      return await mockDataService.getPackedGoodsData();
+    }
+
     try {
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: process.env.PACKAGING_SHEET_ID,
@@ -277,6 +297,10 @@ class GoogleSheetsService {
    * Get combined analytics data with warehouse distribution
    */
   async getCombinedAnalyticsData() {
+    if (this.useMockData) {
+      return await mockDataService.getCombinedAnalyticsData();
+    }
+
     try {
       const [analyticsResult, warehouseResult] = await Promise.all([
         this.getAnalyticsData(),

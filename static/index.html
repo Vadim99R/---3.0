@@ -316,9 +316,14 @@
                     <h2 class="card-title">Автоматическое формирование поставок</h2>
                 </div>
                 
-                <p style="color: #6b7280; margin-bottom: 2rem;">
+                <p style="color: #6b7280; margin-bottom: 1rem;">
                     Система автоматически создаст оптимальные поставки с приоритетом по 2 неделям, учитывая лимит 5500 штук на поставку и время приемки складов.
                 </p>
+                
+                <div style="background: #dbeafe; border: 1px solid #93c5fd; color: #1e40af; padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
+                    <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem;">info</span>
+                    <strong>Демо-режим:</strong> Система использует демонстрационные данные. Для работы с реальными данными настройте интеграцию с Google Sheets API.
+                </div>
 
                 <div class="form-grid">
                     <div class="form-field">
@@ -440,7 +445,9 @@
 
     <script>
         // API Base URL
-        const API_BASE = 'https://5000-igj1hjpt004phe6i344h8-6532622b.e2b.dev/api';
+        const API_BASE = window.location.hostname === 'localhost' ? 
+            'http://localhost:5000/api' : 
+            'https://5000-igj1hjpt004phe6i344h8-6532622b.e2b.dev/api';
         
         // Current state
         let currentSection = 'supply';
